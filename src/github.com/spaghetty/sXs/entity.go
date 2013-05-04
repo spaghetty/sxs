@@ -105,7 +105,7 @@ func (i *IpEntity)sentMsg(msg *DMessage) {
 	} else {
 		found:=false
 		for _,leg := range legs {
-			if leg.DestIp==msg.DestIp {
+			if leg.DestIp==msg.DestIp() {
 				leg.addMsg(msg)
 				found=true
 				break
@@ -125,7 +125,7 @@ func (i *IpEntity)receivedMsg(msg *DMessage) {
 	} else {
 		found:=false
 		for _,leg := range legs {
-			if leg.SrcIp==msg.SrcIp {
+			if leg.SrcIp==msg.SrcIp() {
 				leg.addMsg(msg)
 				found=true
 				break

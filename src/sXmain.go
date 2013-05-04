@@ -21,6 +21,7 @@ type SxsConfig struct {
 }
 
 type SxsGui struct {
+	Helper sxs.InterfaceHelper
         Head bytes.Buffer
         Status bytes.Buffer
         quitflag  bool
@@ -31,6 +32,10 @@ func newSxsGui() *SxsGui {
         tmp:=new(SxsGui)
         tmp.quitflag=false
         return tmp
+}
+
+func (t *SxsGui)GetHelper() *sxs.InterfaceHelper {
+	return &t.Helper
 }
 
 func render_line(line *bytes.Reader, h int) {
@@ -159,7 +164,8 @@ func main() {
 			log.Fatal("Troubles with files")
 		}
 	}
-	mainEngine := sxs.NewEngine()
+	mainGui := newSxsGui()
+	mainEngine := sxs.NewEngine(mainGui)
 	go mainEngine.Run()
         err := termbox.Init()
         if err != nil {
@@ -169,7 +175,6 @@ func main() {
         defer termbox.Close()
 
         termbox.SetInputMode(termbox.InputAlt)
-        mainGui := newSxsGui()
         mainGui.Head.WriteString("sXs 0.0.1 [ applied filter:" + cfg.Filter + " ]")
         mainGui.Status.WriteString("[status] ")
         mainGui.draw()
@@ -199,8 +204,7 @@ func main() {
 				dstPort = pkt.UDP.DestPort
 			}
 			if srcPort!=0 && dstPort!=0 && pkt.Payload!=nil && is_sip(string(pkt.Payload)) {
-				mainEngine.SendMessage(sxs.DMessage{SrcIp:pkt.IP.SrcAddr(), DestIp:pkt.IP.DestAddr(),
-				SrcPort: srcPort, DstPort: dstPort, Msg:string(pkt.Payload)})
+				mainEngine.SendMessage(&sxs.DMessage{pkt,nil})
 			}
 			//fmt.Printf("%s:%d-%d\n",pkt.IP.SrcAddr(),srcPort,dstPort)
 		}

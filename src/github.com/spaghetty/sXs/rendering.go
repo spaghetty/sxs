@@ -4,6 +4,14 @@ import (
 	"log"
 )
 
+type InterfaceHelper struct {
+	Content []DMessage
+}
+
+type Interface interface {
+	GetHelper() *InterfaceHelper
+} 
+
 type ResultSet struct {
 	Request *SxsQuery
 	Responses []*SxsQuery
